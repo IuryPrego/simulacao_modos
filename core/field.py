@@ -30,7 +30,7 @@ class OpticalField:
 
 
     def normalize(self):
-        norm = self.power()
+        norm = self.Power()
         if norm != 0:
             self.E /= np.sqrt(norm)
         else:
