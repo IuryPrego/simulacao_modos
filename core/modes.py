@@ -51,11 +51,6 @@ class LaguerreGaussMode(SpatialMode):
         return np.abs(self.E)**2
 
 
-    def normalize(self):
-        norm = np.sqrt(np.sum(self.intensity()))
-        self.E = self.E / norm
-
-
     def __gouy__(self):
         return (2*self.p + abs(self.l) + 1) * np.arctan(self.z / self.zR)
 
@@ -96,10 +91,6 @@ class HermiteGaussMode(SpatialMode):
     def intensity(self):
         return np.abs(self.E)**2
 
-
-    def normalize(self):
-        norm = np.sqrt(np.sum(self.intensity()))
-        self.E = self.E / norm
 
     def __gouy__(self):
         return (self.m + self.n + 1) * np.arctan(self.z / self.zR)
@@ -159,7 +150,7 @@ class Superposition(SpatialMode):
             phase = self.k * self.z - gouy_phase
 
         E = coef*amplitude * np.exp(1j * phase) * np.exp(1j*k*np.sin(thetax)*x) * np.exp(1j*k*np.sin(thetay)*y)
-        norm = np.sum(np.abs(self.E)) ** 2 * dx * dy
+        norm = np.sum(np.abs(E)) ** 2 * dx * dy
         
         self.E += E/np.sqrt(norm)
 
@@ -199,7 +190,7 @@ class Superposition(SpatialMode):
             phase = - gouy_phase + l * phi
 
         E = coef*amplitude * np.exp(1j * phase) * np.exp(1j*k*np.sin(thetax)*x) * np.exp(1j*k*np.sin(thetay)*y)
-        norm = np.sum(np.abs(self.E)) ** 2 * dx * dy
+        norm = np.sum(np.abs(E)) ** 2 * dx * dy
         
         self.E += E/np.sqrt(norm)
 
@@ -207,14 +198,14 @@ class Superposition(SpatialMode):
     def generate(self):
         modes = self.modes
         for mode in modes:
-            if mode['coef'] == 0:
-                raise ValueError(f'Mode`s coeficient can`t be zero')
             if mode['type'].lower() == 'hg':
                 self.__HermiteMode__(**mode)
             if mode['type'].lower() == 'lg':
                 self.__LaguerreMode__(**mode)
                 
+        self.normalize()
 
+        
 class OpticalFunctions():
     @staticmethod
     def w(w0,z,zR):
