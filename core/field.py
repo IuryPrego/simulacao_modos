@@ -6,12 +6,14 @@ class OpticalField:
         self.x = x
         self.y = y
         self.z = z
+        self.dx = float(x[0, 1] - x[0, 0])
+        self.dy = float(y[1, 0] - y[0, 0])
         self._lambda_ = wavelength
         self.k = 2 * np.pi / wavelength
         if np.sum(E) != None:
             self.E = E
         else:
-            self.E = np.zeros_like(x)
+            self.E = np.zeros_like(x,dtype='complex128')
 
 
 
@@ -24,21 +26,10 @@ class OpticalField:
 
 
     def normalize(self):
-        norm = np.sqrt(np.sum(np.abs(self.E)**2))
+        dx, dy = self.dx,self.dy
+        norm = np.sum(np.abs(self.E) ** 2) * dx * dy
         if norm != 0:
-            self.E /= norm
+            self.E /= np.sqrt(norm)
+        else:
+            raise ValueError('Can`t normalize empty field')
 
-    
-'''
-    def total_power(self):
-        return np.sum(self.intensity()) * self.dx * self.dy
-
-
-    def apply_loss(self, transmission):
-        self.field *= np.sqrt(transmission)
-
-
-    def set_power(self, power_watts):
-        self.field *= np.sqrt(power_watts)
-        self.power_watts = power_watts
-'''
