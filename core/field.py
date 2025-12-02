@@ -19,15 +19,18 @@ class OpticalField:
 
     def intensity(self):
         return np.abs(self.E)**2
-
+    
+    def Power(self):
+        dx, dy = self.dx,self.dy
+        power = np.sum(np.abs(self.E))** 2 * dx * dy
+        return power
 
     def phase(self):
         return np.angle(self.E)
 
 
     def normalize(self):
-        dx, dy = self.dx,self.dy
-        norm = np.sum(np.abs(self.E) ** 2) * dx * dy
+        norm = self.power()
         if norm != 0:
             self.E /= np.sqrt(norm)
         else:
