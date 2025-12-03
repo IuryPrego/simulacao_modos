@@ -149,10 +149,10 @@ class Superposition(SpatialMode):
         else:
             phase = self.k * self.z - gouy_phase
 
-        E = coef*amplitude * np.exp(1j * phase) * np.exp(1j*k*np.sin(thetax)*x) * np.exp(1j*k*np.sin(thetay)*y)
+        E = amplitude * np.exp(1j * phase) * np.exp(1j*k*np.sin(thetax)*x) * np.exp(1j*k*np.sin(thetay)*y)
         norm = np.sum(np.abs(E)) ** 2 * dx * dy
-        
-        self.E += E/np.sqrt(norm)
+        if norm != 0:
+            self.E += coef*E/np.sqrt(norm)
 
 
     def __LaguerreMode__(self,**kwargs):
@@ -189,19 +189,21 @@ class Superposition(SpatialMode):
         else:
             phase = - gouy_phase + l * phi
 
-        E = coef*amplitude * np.exp(1j * phase) * np.exp(1j*k*np.sin(thetax)*x) * np.exp(1j*k*np.sin(thetay)*y)
+        E = amplitude * np.exp(1j * phase) * np.exp(1j*k*np.sin(thetax)*x) * np.exp(1j*k*np.sin(thetay)*y)
         norm = np.sum(np.abs(E)) ** 2 * dx * dy
         
-        self.E += E/np.sqrt(norm)
+        if norm != 0:
+            self.E += coef*E/np.sqrt(norm)
 
 
     def generate(self):
-        modes = self.modes
-        for mode in modes:
+        for mode in self.modes:
             if mode['type'].lower() == 'hg':
-                self.__HermiteMode__(**mode)
+                if not 'coef' in mode or mode['coef'] != 0:
+                    self.__HermiteMode__(**mode)
             if mode['type'].lower() == 'lg':
-                self.__LaguerreMode__(**mode)
+                if not 'coef' in mode or mode['coef'] != 0:
+                    self.__LaguerreMode__(**mode)
                 
         self.normalize()
 
