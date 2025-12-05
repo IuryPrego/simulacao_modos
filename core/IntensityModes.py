@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.special import genlaguerre, hermite
 
-def LaguerreGauss(x,y,l=0,p=0,z=0,w0=1e-3,thetax=0,thetay=0,wavelength=632.8e-9,normalize=True):
+def LaguerreGauss(x,y,l=0,p=0,z=0,w0=1e-3,theta_x=0,theta_y=0,wavelength=632.8e-9,normalize=True):
     dx = float(x[0, 1] - x[0, 0])
     dy = float(y[1, 0] - y[0, 0])
     r = np.sqrt(x**2 + y**2)
@@ -15,7 +15,7 @@ def LaguerreGauss(x,y,l=0,p=0,z=0,w0=1e-3,thetax=0,thetay=0,wavelength=632.8e-9,
 
     amplitude = (w0 / w) * ((np.sqrt(2) * r / w)**abs(l)) * L * np.exp(-r**2 / w**2)
     gouy_phase = (2*p + abs(l) + 1) * np.arctan(z / zR)
-    tilt = np.exp(1j*k*(thetax)*x) * np.exp(1j*k*(thetay)*y)
+    tilt = np.exp(1j*k*(theta_x)*x) * np.exp(1j*k*(theta_y)*y)
     
     if z != 0:
         R = z * (1 + (zR / z)**2)
@@ -34,7 +34,7 @@ def LaguerreGauss(x,y,l=0,p=0,z=0,w0=1e-3,thetax=0,thetay=0,wavelength=632.8e-9,
         return E
 
 
-def Hermite(x,y,m=0,n=0,z=0,w0=1e-3,thetax=0,thetay=0,wavelength=632.8e-9,normalize=True):
+def HermiteGauss(x,y,m=0,n=0,z=0,w0=1e-3,thetax=0,thetay=0,wavelength=632.8e-9,normalize=True):
     dx = float(x[0, 1] - x[0, 0])
     dy = float(y[1, 0] - y[0, 0])
     k = 2 * np.pi / wavelength
