@@ -1,6 +1,9 @@
 import numpy as np
 
 def Intensity(E):
+    if E.ndim == 3:
+        E = np.linalg.norm(E,axis=0)
+        print(E.shape)
     return np.abs(E)**2
 
 def Phase(self):
