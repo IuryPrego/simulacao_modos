@@ -2,11 +2,11 @@ import numpy as np
 
 def intensity(E):
     if E.ndim == 3:
-        E = np.linalg.norm(E,axis=0)
+        E = np.linalg.norm(E,axis=2)
     return np.abs(E)**2
 
-def phase(self):
-    return np.angle(self.E)
+def phase(E):
+    return np.angle(E)
 
 def power(x,y,E):
     dx = float(x[0, 1] - x[0, 0])
