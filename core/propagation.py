@@ -1,6 +1,6 @@
 import numpy as np
 
-def AngularSpectrum(x,y,z,field,wavelength):
+def angular_spectrum(x,y,z,field,wavelength):
     nx,ny = field.shape[-1],field.shape[-2]
 
     dx = float(x[0, 1] - x[0, 0])

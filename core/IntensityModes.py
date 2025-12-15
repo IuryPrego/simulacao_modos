@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.special import genlaguerre, hermite
 
-def LaguerreGauss(x,y,l=0,p=0,z=0,w0=1e-3,theta_x=0,theta_y=0,wavelength=632.8e-9,normalize=True):
+def laguerre_gauss(x,y,l=0,p=0,z=0,w0=1e-3,theta_x=0,theta_y=0,wavelength=632.8e-9,normalize=True):
     dx = float(x[0, 1] - x[0, 0])
     dy = float(y[1, 0] - y[0, 0])
     r = np.sqrt(x**2 + y**2)
@@ -34,7 +34,7 @@ def LaguerreGauss(x,y,l=0,p=0,z=0,w0=1e-3,theta_x=0,theta_y=0,wavelength=632.8e-
         return E
 
 
-def HermiteGauss(x,y,m=0,n=0,z=0,w0=1e-3,thetax=0,thetay=0,wavelength=632.8e-9,normalize=True):
+def hermite_gauss(x,y,m=0,n=0,z=0,w0=1e-3,thetax=0,thetay=0,wavelength=632.8e-9,normalize=True):
     dx = float(x[0, 1] - x[0, 0])
     dy = float(y[1, 0] - y[0, 0])
     k = 2 * np.pi / wavelength

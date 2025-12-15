@@ -1,8 +1,6 @@
 import numpy as np
 
-
-def LinearPolarized(field,method='linear',theta=0):
-    P = np.ones([2,*field.shape])
+def linear_polarized(field,method='linear',theta=0):
     match method:
         case 'linear':
             phase_mat = np.array([[np.cos(theta),-np.sin(theta)],
@@ -10,7 +8,10 @@ def LinearPolarized(field,method='linear',theta=0):
         case 'halfwave':
             phase_mat = np.array([[np.cos(2*theta),  np.sin(2*theta)],
                                   [np.sin(2*theta), -np.cos(2*theta)]])
-    P = phase_mat*P
-    E = np.einsum('xy,xyi->xyi',field,P)
-    
 
+    if field.ndim == 3:
+        return phase_mat*field
+    else:
+        P = np.ones([2,*field.shape])
+        P = phase_mat*P
+        return field[..., None] * P
