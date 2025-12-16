@@ -6,6 +6,8 @@ def intensity(E,cmap='viridis'):
         E = np.linalg.norm(E,axis=2)
     E = np.abs(E)**2
     plt.imshow(E,cmap, vmin=0, vmax=max(1e-5,np.max(E)))
+    plt.tight_layout()
+    plt.axis('off')
 
 
 def phase(E):
