@@ -1,5 +1,7 @@
 import numpy as np
 from scipy.special import genlaguerre, hermite
+from core.metrics import power
+
 
 def laguerre_gauss(x,y,l=0,p=0,z=0,w0=1e-3,theta_x=0,theta_y=0,wavelength=632.8e-9,normalize=True):
     dx = float(x[0, 1] - x[0, 0])
@@ -26,7 +28,7 @@ def laguerre_gauss(x,y,l=0,p=0,z=0,w0=1e-3,theta_x=0,theta_y=0,wavelength=632.8e
     E = amplitude * np.exp(1j * phase) * tilt
 
     if normalize:
-        norm = np.sum(np.abs(E)) ** 2 * dx * dy
+        norm = power(x,y,E)
 
     if norm != 0:
         return E/np.sqrt(norm)
@@ -59,7 +61,7 @@ def hermite_gauss(x,y,m=0,n=0,z=0,w0=1e-3,thetax=0,thetay=0,wavelength=632.8e-9,
     E = amplitude * np.exp(1j * phase) * tilt
 
     if normalize:
-        norm = np.sum(np.abs(E)) ** 2 * dx * dy
+        norm = power(x,y,E)
 
     if norm != 0:
         return E/np.sqrt(norm)
