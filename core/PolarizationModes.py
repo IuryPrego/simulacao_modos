@@ -48,3 +48,6 @@ def filter_polarizer(field,theta=0,method='linear'):
     else:
         raise ValueError('filter_polarizer expects a np.array with a shape: (..., 2).')
     
+
+def q_plate(field,theta=0,method='rotation'):
+    return 0
