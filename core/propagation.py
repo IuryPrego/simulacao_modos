@@ -10,7 +10,7 @@ def angular_spectrum(field, x, y, z, wavelength=632.8e-9):
     k = 2*np.pi / wavelength
     kx = 2*np.pi * np.fft.fftfreq(nx, d=dx)
     ky = 2*np.pi * np.fft.fftfreq(ny, d=dy)
-    kx, ky = np.meshgrid(kx, ky, indexing='ij')
+    kx, ky = np.meshgrid(kx, ky)
 
     field_fourier = np.fft.fft2(field, axes=(0, 1))
     propagator = np.exp(-1j * (kx**2 + ky**2) * z / (2*k))
