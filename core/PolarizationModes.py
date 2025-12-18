@@ -20,8 +20,8 @@ def optical_element(field,theta=0,method='rotation'):
             cos, sen = np.cos(theta), np.sin(theta)
             phase_mat = np.exp(-1j*np.pi/4) * np.array([[cos**2 + 1j*sen**2, (1-1j)*cos*sen],
                                                         [(1-1j)*cos*sen, sen**2 + 1j*cos**2]])
-        case default:
-            raise TypeError('method must be "half", "quarter"')
+        case _:
+            raise TypeError("method must be 'half', 'quarter'")
         
     if field.ndim == 3:
         return field@phase_mat.T
@@ -35,13 +35,13 @@ def filter_polarizer(field,theta=0,method='linear'):
             phase_mat = np.array([[cos**2,cos*sen],
                                   [cos*sen, sen**2]])
         case 'Rcirc':
-            phase_mat = 1/2*np.array([[1,  1j],
-                                      [-1j, 1]])
-        case 'Lcirc':
             phase_mat = 1/2*np.array([[1,  -1j],
                                       [1j, 1]])
-        case default:  
-            raise ValueError("method must be 'linear', 'Rcirc' or 'Lcirc'")
+        case 'Lcirc':
+            phase_mat = 1/2*np.array([[1,  1j],
+                                      [-1j, 1]])
+        case _:  
+            raise TypeError("method must be 'linear', 'Rcirc' or 'Lcirc'")
 
     if field.ndim == 3:
         return field@phase_mat.T
