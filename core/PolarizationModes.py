@@ -6,7 +6,7 @@ def scalar_to_vector(field, pol=(1,0)):
     pol = pol / np.linalg.norm(pol)
     return field[...,None] * pol
 
-def optical_element(field,theta=0,method='rotation'):
+def optical_element(x,y,field,theta=0,method='rotation'):
     match method:
         case 'rotation':
             cos, sen = np.cos(theta), np.sin(theta)
@@ -26,9 +26,11 @@ def optical_element(field,theta=0,method='rotation'):
     if field.ndim == 3:
         return field@phase_mat.T
     else:
+        print(phase_mat.T.shape)
+        return field@phase_mat.T
         raise ValueError('optical_element expects a np.array with a shape: (..., 2).')
     
-def filter_polarizer(field,theta=0,method='linear'):
+def filter_polarizer(x,y,field,theta=0,method='linear'):
     match method:
         case 'linear':
             cos, sen = np.cos(theta), np.sin(theta)
@@ -49,5 +51,9 @@ def filter_polarizer(field,theta=0,method='linear'):
         raise ValueError('filter_polarizer expects a np.array with a shape: (..., 2).')
     
 
-def q_plate(field,theta=0,method='rotation'):
-    return 0
+def q_plate(x,y,field,theta=0,q=1/2):
+    alpha = q*np.arctan2(y, x) + theta
+    
+    phase_mat = optical_element(x,y,field,alpha)
+
+    return phase_mat
