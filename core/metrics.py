@@ -15,7 +15,7 @@ def intensity(field,cmap='viridis',pace=50,scale=30,animate=False,t=0):
     if field_p.ndim == 3:
         x,y = np.meshgrid(np.linspace(0,len(field[0,:]),len(field[0,:])),np.linspace(0,len(field[0,:]),len(field[:,0])))
 
-        field_p[field/field.max() <= 1e-5] = 0
+        field_p[field/field.max() <= 1e-1] = 0
 
         Ex = field_p[...,0]
         Ey = field_p[...,1]
