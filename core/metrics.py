@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-def intensity(field,cmap='viridis',pace=50,scale=30,animate=False,t=0):
+def intensity(field,cmap='viridis',vector_field=True,pace=50,scale=30,animate=False,t=0):
     field_p = field[...]
     if field.ndim == 3:
         field = np.linalg.norm(field,axis=2)
@@ -12,7 +12,7 @@ def intensity(field,cmap='viridis',pace=50,scale=30,animate=False,t=0):
     plt.axis('off')
     plt.imshow(field,cmap, vmin=0, vmax=max(1e-5,np.max(field)))
 
-    if field_p.ndim == 3:
+    if field_p.ndim == 3 and vector_field:
         x,y = np.meshgrid(np.linspace(0,len(field[0,:]),len(field[0,:])),np.linspace(0,len(field[0,:]),len(field[:,0])))
 
         field_p[field/field.max() <= 1e-1] = 0
