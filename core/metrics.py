@@ -1,8 +1,10 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-def intensity(field,cmap='viridis',vector_field=True,pace=50,scale=30,animate=False,t=0):
-    field_p = field[...]
+def intensity(field,cmap='viridis',vector_field=True,pace=None,scale=40,animate=False,t=0,rel_threshold=1e-1):
+    field_p = np.copy(field)
+    field = np.copy(field)
+
     if field.ndim == 3:
         field = np.linalg.norm(field,axis=2)
     field = np.abs(field)**2
@@ -15,7 +17,7 @@ def intensity(field,cmap='viridis',vector_field=True,pace=50,scale=30,animate=Fa
     if field_p.ndim == 3 and vector_field:
         x,y = np.meshgrid(np.linspace(0,len(field[0,:]),len(field[0,:])),np.linspace(0,len(field[0,:]),len(field[:,0])))
 
-        field_p[field/field.max() <= 1e-1] = 0
+        field_p[field/field.max() <= rel_threshold] = 0
 
         Ex = field_p[...,0]
         Ey = field_p[...,1]
@@ -38,6 +40,9 @@ def intensity(field,cmap='viridis',vector_field=True,pace=50,scale=30,animate=Fa
             u = np.abs(Ex)
             v = np.abs(Ey)
 
+        if pace == None:
+            pace = int(np.min(field.shape)/30)
+
         plt.quiver(x[::pace, ::pace], y[::pace, ::pace],
                 u[::pace, ::pace],v[::pace, ::pace],
                 cmap='gray',
@@ -49,6 +54,8 @@ def phase(field):
     return np.angle(field)
 
 def power(x,y,field):
+    field = np.copy(field)
+    
     dx = float(x[0, 1] - x[0, 0])
     dy = float(y[1, 0] - y[0, 0])
     if field.ndim == 3:

@@ -1,60 +1,15 @@
 import numpy as np
 from scipy.ndimage import gaussian_filter
 
-#chatgpt
 def turbulence_mask(shape, strength=1.0, corr_px=20):
-    """
-    Máscara de turbulência (fase aleatória correlacionada)
     
-    shape     : (ny, nx)
-    strength  : força da turbulência (rad)
-    corr_px   : comprimento de correlação (pixels)
-    """
     phase = np.random.randn(*shape)
     phase = gaussian_filter(phase, corr_px)
     phase *= strength / np.std(phase)
 
     return np.exp(1j * phase)
 
-import numpy as np
-
-def kolmogorov_phase_screen(nx, ny, dx, dy, r0,
-                            L0=np.inf, l0=0.0):
-    """
-    Tela de fase de turbulência (Kolmogorov / von Kármán)
-
-    nx, ny : número de pontos
-    dx, dy : passo espacial (m)
-    r0     : parâmetro de Fried (m)
-    L0     : outer scale (m)
-    l0     : inner scale (m)
-    """
-
-    fx = np.fft.fftfreq(nx, dx)
-    fy = np.fft.fftfreq(ny, dy)
-    FX, FY = np.meshgrid(fx, fy, indexing='xy')
-
-    kappa = 2*np.pi * np.sqrt(FX**2 + FY**2)
-    kappa[0, 0] = np.inf  # evita divergência
-
-    # escalas
-    k0 = 0 if np.isinf(L0) else 2*np.pi / L0
-    km = np.inf if l0 == 0 else 5.92 / l0
-
-    PSD = 0.023 * r0**(-5/3) * (kappa**2 + k0**2)**(-11/6)
-    PSD *= np.exp(-(kappa/km)**2)
-
-    # ruído complexo gaussiano
-    cn = (np.random.randn(ny, nx) +
-          1j*np.random.randn(ny, nx)) / np.sqrt(2)
-
-    phase_ft = cn * np.sqrt(PSD) * (2*np.pi*np.sqrt(dx*dy))
-    phase = np.real(np.fft.ifft2(np.fft.ifftshift(phase_ft)))
-
-    return np.exp(1j * phase), phase
-
-import numpy as np
-
+#chatgpt, nem entendo essa parte aqui, só queria poder testar
 def turbulence_screen(x, y,
                       r0=8e-4,
                       L0=10.0,

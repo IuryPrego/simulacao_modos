@@ -3,6 +3,8 @@ import numpy as np
 
 # propagação usando espectro angular a aproximação paraxial
 def angular_spectrum(field, x, y, z, wavelength=632.8e-9):
+    field = np.copy(field)
+
 
     nx, ny = field.shape[0], field.shape[1]
     dx = float(x[0, 1] - x[0, 0])
