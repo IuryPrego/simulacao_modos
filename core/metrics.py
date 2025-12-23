@@ -9,10 +9,13 @@ def intensity(field,cmap='viridis',vector_field=True,pace=None,scale=40,animate=
         field = np.linalg.norm(field,axis=2)
     field = np.abs(field)**2
 
-    plt.figure().frameon = False
-    plt.axis('equal')
-    plt.axis('off')
-    plt.imshow(field,cmap, vmin=0, vmax=max(1e-5,np.max(field)))
+    fig,ax = plt.subplots()
+
+    fig.frameon = False
+
+    ax.axis('equal')
+    ax.axis('off')
+    ax.imshow(field,cmap, vmin=0, vmax=max(1e-5,np.max(field)))
 
     if field_p.ndim == 3 and vector_field:
         x,y = np.meshgrid(np.linspace(0,len(field[0,:]),len(field[0,:])),np.linspace(0,len(field[0,:]),len(field[:,0])))
@@ -43,12 +46,13 @@ def intensity(field,cmap='viridis',vector_field=True,pace=None,scale=40,animate=
         if pace == None:
             pace = int(np.min(field.shape)/30)
 
-        plt.quiver(x[::pace, ::pace], y[::pace, ::pace],
+        ax.quiver(x[::pace, ::pace], y[::pace, ::pace],
                 u[::pace, ::pace],v[::pace, ::pace],
                 cmap='gray',
                 pivot='middle',
                 scale=scale)
     
+    return fig,ax
 
 def phase(field):
     return np.angle(field)
