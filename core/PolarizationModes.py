@@ -2,7 +2,7 @@ import numpy as np
 
 
 def scalar_to_vector(field, pol=(1,0)):
-    pol = np.asarray(pol, dtype=complex)
+    pol = np.array(pol, dtype=complex)
     pol = pol / np.linalg.norm(pol)
     return field[...,None] * pol
 
@@ -51,22 +51,22 @@ def filter_polarizer(x,y,field,theta=0,method='linear'):
 
 def q_plate(x,y,field,theta=0,delta=np.pi,q=1/2):    
 
-    phase_mat = np.array([[np.exp(1j*delta/2,0)],
+    phase_mat = np.array([[np.exp(1j*delta/2),0],
                           [0,np.exp(-1j*delta/2)]])
 
     alpha = q*np.arctan2(y, x) + theta
     cos, sen = np.cos(-alpha), np.sin(-alpha)
     rot = np.array([[cos,-sen],
                     [sen, cos]])
-    rot_minus = rot.transpose(3,2,0,1)
+    rot_minus = rot.transpose(3,2,0,1)[...]
 
     cos, sen = np.cos(alpha), np.sin(alpha)
     rot = np.array([[cos,-sen],
                     [sen, cos]])
-    rot_plus = rot.transpose(3,2,0,1)
+    rot_plus = rot.transpose(3,2,0,1)[...]
     
     
     phase_mat = rot_minus@phase_mat@rot_plus
     field = phase_mat @ field[..., None]
-    
+
     return field[...,0]
