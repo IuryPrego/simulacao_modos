@@ -38,12 +38,6 @@ def intensity(field,cmap='viridis',pace=50,scale=30,animate=False,t=0):
             u = np.abs(Ex)
             v = np.abs(Ey)
 
-
-        u[:,0] = 0
-        v[:,0] = 0
-        u[0,:] = 0
-        v[0,:] = 0
-
         plt.quiver(x[::pace, ::pace], y[::pace, ::pace],
                 u[::pace, ::pace],v[::pace, ::pace],
                 cmap='gray',
