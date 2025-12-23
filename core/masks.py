@@ -1,6 +1,9 @@
 import numpy as np
 from scipy.ndimage import gaussian_filter
 
+# creation of masks that simulate turbulance
+# the functions get the shape and parameters to do a mask to be aplied in a scalar field (some alterations should be made to use it in a vector field)
+
 def turbulence_mask(shape, strength=1.0, corr_px=20):
     
     phase = np.random.randn(*shape)

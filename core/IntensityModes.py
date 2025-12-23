@@ -2,6 +2,8 @@ import numpy as np
 from scipy.special import genlaguerre, hermite
 from core.metrics import power
 
+# creation of intensity modes laguerre and hermite gauss beams
+# the functions get x,y and beams parameters to create and return a escalar field
 
 def laguerre_gauss(x,y,l=0,p=0,z=0,w0=1e-3,theta_x=0,theta_y=0,wavelength=632.8e-9,normalize=True):
     dx = float(x[0, 1] - x[0, 0])

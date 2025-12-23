@@ -1,6 +1,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
+# Plot the intensity and the polarization directions and return the fig,ax to posterior alterations
 def intensity(field,cmap='viridis',vector_field=True,pace=None,scale=40,animate=False,t=0,rel_threshold=1e-1):
     field_p = np.copy(field)
     field = np.copy(field)
@@ -54,9 +55,13 @@ def intensity(field,cmap='viridis',vector_field=True,pace=None,scale=40,animate=
     
     return fig,ax
 
+
+# only work in scalar fields
 def phase(field):
     return np.angle(field)
 
+
+# measure of power
 def power(x,y,field):
     field = np.copy(field)
     

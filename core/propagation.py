@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-# propagação usando espectro angular a aproximação paraxial
+# propagation using angular espectrum and the paraxial aproximation
 def angular_spectrum(field, x, y, z, wavelength=632.8e-9):
     field = np.copy(field)
 

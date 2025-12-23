@@ -1,12 +1,15 @@
 import numpy as np
 
 
+# get your scalar field and convert in a vector field with a give polarization
 def scalar_to_vector(field, pol=(1,0)):
     pol = np.array(pol, dtype=complex)
     pol = pol / np.linalg.norm(pol)
     return field[...,None] * pol
 
-def optical_element(x,y,field,theta=0,method='rotation'):
+
+# Get the field and simulate half wave plates and quartes wave plates
+def optical_element(x,y,field,theta=0,method='half'):
     field = np.copy(field)
 
     match method:
@@ -23,13 +26,17 @@ def optical_element(x,y,field,theta=0,method='rotation'):
             phase_mat = np.exp(-1j*np.pi/4) * np.array([[cos**2 + 1j*sen**2, (1-1j)*cos*sen],
                                                         [(1-1j)*cos*sen, sen**2 + 1j*cos**2]])
         case _:
-            raise TypeError("method must be 'half', 'quarter'")
+            raise TypeError("method must be 'half', 'quarter', 'rotation")
         
     if field.ndim == 3:
         return field@phase_mat.T
     else:
         raise ValueError('optical_element expects a np.array with a shape: (..., 2).')
     
+
+
+# simulate a polarizer
+# it measures the componente of the choosen polarization base
 def filter_polarizer(x,y,field,theta=0,method='linear'):
     field = np.copy(field)
 
@@ -53,6 +60,8 @@ def filter_polarizer(x,y,field,theta=0,method='linear'):
         raise ValueError('filter_polarizer expects a np.array with a shape: (..., 2).')
     
 
+# Simulates a q-plate
+# An optical element that does crazy things, it couples polarization to the transverse intensity profile
 def q_plate(x,y,field,theta=0,delta=np.pi,q=1/2):
     field = np.copy(field)
 
