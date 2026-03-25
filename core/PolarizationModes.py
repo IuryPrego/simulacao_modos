@@ -1,3 +1,5 @@
+from ctypes import FormatError
+
 import numpy as np
 
 
@@ -11,6 +13,9 @@ def scalar_to_vector(field, pol=(1,0)):
 # Get the field and simulate half wave plates and quartes wave plates
 def optical_element(x,y,field,theta=0,method='half'):
     field = np.copy(field)
+
+    if field.ndim<3:
+        field = scalar_to_vector(field)
 
     match method:
         case 'rotation':
@@ -28,10 +33,7 @@ def optical_element(x,y,field,theta=0,method='half'):
         case _:
             raise TypeError("method must be 'half', 'quarter', 'rotation")
         
-    if field.ndim == 3:
-        return field@phase_mat.T
-    else:
-        raise ValueError('optical_element expects a np.array with a shape: (..., 2).')
+    return field@phase_mat.T
     
 
 
@@ -39,6 +41,9 @@ def optical_element(x,y,field,theta=0,method='half'):
 # it measures the componente of the choosen polarization base
 def filter_polarizer(x,y,field,theta=0,method='linear'):
     field = np.copy(field)
+
+    if field.ndim<3:
+        raise TypeError("the field should be 3-dimensional, polarize it in first place with: 'optical_element(x,y,field)'")
 
     match method:
         case 'linear':
@@ -54,16 +59,16 @@ def filter_polarizer(x,y,field,theta=0,method='linear'):
         case _:  
             raise TypeError("method must be 'linear', 'Rcirc' or 'Lcirc'")
 
-    if field.ndim == 3:
-        return field@phase_mat.T
-    else:
-        raise ValueError('filter_polarizer expects a np.array with a shape: (..., 2).')
+    return field@phase_mat.T
     
 
 # Simulates a q-plate
 # An optical element that does crazy things, it couples polarization to the transverse intensity profile
 def q_plate(x,y,field,theta=0,delta=np.pi,q=1/2):
     field = np.copy(field)
+    
+    if field.ndim<3:
+        field = scalar_to_vector(field)
 
     phase_mat = np.array([[np.exp(1j*delta/2),0],
                           [0,np.exp(-1j*delta/2)]])
