@@ -1,6 +1,6 @@
 import numpy as np
 
-
+# unused code
 class OpticalField:
     def __init__(self, x, y, z=0, wavelength=632.8e-9, E=None):
         self.x = x

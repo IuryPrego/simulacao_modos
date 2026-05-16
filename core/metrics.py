@@ -1,6 +1,9 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
+def inner_product(f, g, dx, dy):
+    return np.sum(f * np.conj(g)) * dx * dy
+
 # Plot the intensity and the polarization directions and return the fig,ax to posterior alterations
 def intensity(field,cmap='viridis',vector_field=True,pace=None,scale=40,animate=False,t=0,rel_threshold=1e-1):
     field_p = np.copy(field)
