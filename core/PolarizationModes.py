@@ -7,7 +7,7 @@ import numpy as np
 def scalar_to_vector(field, pol=(1,0)):
     pol = np.array(pol, dtype=complex)
     pol = pol / np.linalg.norm(pol)
-    return field[...,None] * pol
+    return np.copy(field)[...,None] * pol
 
 
 # Get the field and simulate half wave plates and quartes wave plates
