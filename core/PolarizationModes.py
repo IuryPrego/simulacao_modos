@@ -11,7 +11,7 @@ def scalar_to_vector(field, pol=(1,0)):
 
 
 # Get the field and simulate half wave plates and quartes wave plates
-def optical_element(x,y,field,theta=0,method='half'):
+def optical_element(field,theta=0,method='half'):
     field = np.copy(field)
 
     if field.ndim<3:
@@ -39,7 +39,7 @@ def optical_element(x,y,field,theta=0,method='half'):
 
 # simulate a polarizer
 # it measures the componente of the choosen polarization base
-def filter_polarizer(x,y,field,theta=0,method='linear'):
+def filter_polarizer(field,theta=0,method='linear'):
     field = np.copy(field)
 
     if field.ndim<3:
