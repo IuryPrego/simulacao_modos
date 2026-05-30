@@ -5,7 +5,6 @@ import numpy as np
 def angular_spectrum(field, x, y, z, wavelength=632.8e-9):
     field = np.copy(field)
 
-
     nx, ny = field.shape[0], field.shape[1]
     dx = float(x[0, 1] - x[0, 0])
     dy = float(y[1, 0] - y[0, 0])
@@ -31,3 +30,19 @@ def angular_spectrum(field, x, y, z, wavelength=632.8e-9):
     else:
         return field
 
+def tilt(field, x, y, thetax=0, thetay=0, wavelength=632.8e-9):
+    k = 2 * np.pi / wavelength
+    tilt = np.exp(1j * k * thetay * y) * np.exp(1j * k * thetax * x)
+
+    dx = float(x[0, 1] - x[0, 0])
+    dy = float(y[1, 0] - y[0, 0])
+
+    kmaxx = np.pi / dx
+    kmaxy = np.pi / dy
+
+    kx = k * thetax
+    ky = k * thetay
+
+    if np.abs(kx) > kmaxx or np.abs(ky) > kmaxy:
+        raise ValueError("Tilt muito grande: vai dar aliasing!")
+    return field * tilt
