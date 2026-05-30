@@ -44,5 +44,5 @@ def tilt(field, x, y, thetax=0, thetay=0, wavelength=632.8e-9):
     ky = k * thetay
 
     if np.abs(kx) > kmaxx or np.abs(ky) > kmaxy:
-        raise ValueError("Tilt muito grande: vai dar aliasing!")
-    return field * tilt
+        raise ValueError("Tilt muito grande: vai dar aliasing! use no máximo thetax = {} e thetay = {}".format(kmaxx/k, kmaxy/k))
+    return np.copy(field) * tilt
