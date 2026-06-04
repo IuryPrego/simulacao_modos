@@ -25,24 +25,24 @@ def angular_spectrum(field, x, y, z, wavelength=632.8e-9):
     
     return field
 
-def tilt(field, x, y, thetax=0, thetay=0, wavelength=632.8e-9):
+def tilt(field, x, y, thetax=0, thetay=0, safe= True, wavelength=632.8e-9):
     k = 2 * np.pi / wavelength
     tilt_phase = np.exp(1j * k * thetay * y) * np.exp(1j * k * thetax * x)
+    if safe:
+        dx = float(x[0, 1] - x[0, 0])
+        dy = float(y[1, 0] - y[0, 0])
 
-    dx = float(x[0, 1] - x[0, 0])
-    dy = float(y[1, 0] - y[0, 0])
+        kmaxx = np.pi / dx
+        kmaxy = np.pi / dy
 
-    kmaxx = np.pi / dx
-    kmaxy = np.pi / dy
+        kx = k * thetax
+        ky = k * thetay
 
-    kx = k * thetax
-    ky = k * thetay
-
-    if np.abs(kx) > kmaxx or np.abs(ky) > kmaxy:
-        raise ValueError("Tilt muito grande: vai dar aliasing! use no máximo thetax = {} e thetay = {}".format(kmaxx/k, kmaxy/k))
+        if np.abs(kx) > kmaxx or np.abs(ky) > kmaxy:
+            raise ValueError("Tilt muito grande: vai dar aliasing! use no máximo thetax = {} e thetay = {}".format(kmaxx/k, kmaxy/k))
     return np.copy(field) * tilt_phase[...,None] if field.ndim == 3 else np.copy(field) * tilt_phase
 
-def mirror(field, x, y, theta=0, phi=0, rs=-1, rp=-1,tilt=False, wavelength=632.8e-9):
+def mirror(field, x, y, theta=0, phi=0, rs=-1, rp=-1,tilt=False,safe = False, wavelength=632.8e-9):
     """
     theta : ângulo do espelho com z (0 = perpendicular ao feixe)
     phi   : orientação azimutal do espelho
@@ -55,7 +55,7 @@ def mirror(field, x, y, theta=0, phi=0, rs=-1, rp=-1,tilt=False, wavelength=632.
     thetax = 2 * np.sin(theta) * np.cos(phi)
     thetay = 2 * np.sin(theta) * np.sin(phi)
     if tilt:
-        field = tilt(field, x, y, thetax=thetax, thetay=thetay, wavelength=wavelength)
+        field = tilt(field, x, y, thetax=thetax, thetay=thetay, safe=safe, wavelength=wavelength)
 
     # Rotação de polarização s/p → x/y (só para campos vetoriais)
     if field.ndim == 3:
@@ -92,6 +92,7 @@ def BeamSplitter(field1=None,field2=None,theta=np.pi/4, phi_0=0, phi_r=0, phi_t=
     return field
 
 def Lens(field, x, y, f, n=1.5, d0 = 0, wavelength=632.8e-9):
+    field = np.copy(field)
     k = 2 * np.pi / wavelength
     lens_phase = np.exp(-1j * k * (x**2 + y**2) / (2*f)) * np.exp(-1j * n * k * d0)
-    return np.copy(field) * lens_phase[...,None] if field.ndim == 3 else np.copy(field) * lens_phase
+    return field * lens_phase[...,None] if field.ndim == 3 else field * lens_phase
