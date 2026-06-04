@@ -42,7 +42,6 @@ def hermite_gauss(x, y, m=0, n=0, z=0, w0=1e-3, wavelength=632.8e-9):
     a = np.sqrt(2) / w
 
     # normalização analítica
-    log_norm = 0.5 * np.log(a)
     log_norm = (- np.log(w)
                 + 0.5 * np.log(2/np.pi)
                 - 0.5 * ((m+n)*np.log(2) + gammaln(m+1) + gammaln(n+1)))
