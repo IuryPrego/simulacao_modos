@@ -23,16 +23,11 @@ def angular_spectrum(field, x, y, z, wavelength=632.8e-9):
 
     field = np.fft.ifft2(field_fourier, axes=(0, 1))
     
-    norm = np.sum(np.abs(field)) ** 2 * dx * dy
-    
-    if norm != 0:
-        return field/np.sqrt(norm)
-    else:
-        return field
+    return field
 
 def tilt(field, x, y, thetax=0, thetay=0, wavelength=632.8e-9):
     k = 2 * np.pi / wavelength
-    tilt = np.exp(1j * k * thetay * y) * np.exp(1j * k * thetax * x)
+    tilt_phase = np.exp(1j * k * thetay * y) * np.exp(1j * k * thetax * x)
 
     dx = float(x[0, 1] - x[0, 0])
     dy = float(y[1, 0] - y[0, 0])
@@ -45,7 +40,7 @@ def tilt(field, x, y, thetax=0, thetay=0, wavelength=632.8e-9):
 
     if np.abs(kx) > kmaxx or np.abs(ky) > kmaxy:
         raise ValueError("Tilt muito grande: vai dar aliasing! use no máximo thetax = {} e thetay = {}".format(kmaxx/k, kmaxy/k))
-    return np.copy(field) * tilt
+    return np.copy(field) * tilt_phase[...,None] if field.ndim == 3 else np.copy(field) * tilt_phase
 
 def mirror(field, x, y, theta=0, phi=0, rs=-1, rp=-1, wavelength=632.8e-9):
     """
@@ -70,5 +65,6 @@ def mirror(field, x, y, theta=0, phi=0, rs=-1, rp=-1, wavelength=632.8e-9):
                           [0,  rs]])
         M = R.T @ Jones @ R
         field = field @ M.T
-
+    else:
+        field = field * rs
     return field

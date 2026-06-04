@@ -73,7 +73,7 @@ def q_plate(x,y,field,theta=0,delta=np.pi,q=1/2):
     phase_mat = np.array([[np.exp(1j*delta/2),0],
                           [0,np.exp(-1j*delta/2)]])
 
-    alpha = q*np.arctan2(y, x) + theta
+    alpha = q*np.arctan2(y, x) - theta
     cos, sen = np.cos(-alpha), np.sin(-alpha)
     rot = np.array([[cos,-sen],
                     [sen, cos]])

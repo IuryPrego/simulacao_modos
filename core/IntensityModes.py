@@ -50,8 +50,8 @@ def hermite_gauss(x, y, m=0, n=0, z=0, w0=1e-3, wavelength=632.8e-9):
     Hn = eval_hermite(n, a*x1)
     Hm = eval_hermite(m, a*y1)
 
-    gx = Hn * np.exp(-(a*x1)**2 / 2)
-    gy = Hm * np.exp(-(a*y1)**2 / 2)
+    gy = Hn * np.exp(-(a*x1)**2 / 2)
+    gx = Hm * np.exp(-(a*y1)**2 / 2)
 
     amplitude = np.outer(gy, gx)*np.exp(log_norm)
 
