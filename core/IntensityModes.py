@@ -65,7 +65,7 @@ def hermite_gauss(x, y, m=0, n=0, z=0, w0=1e-3, wavelength=632.8e-9):
 
     return amplitude * np.exp(1j * phase)
 
-def hg_1d_n(x, m, w=1e-3):
+def hermite_gauss_1d(x, m, w=1e-3):
     a = np.sqrt(2) / w
     xi = a * x 
     
