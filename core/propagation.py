@@ -46,3 +46,29 @@ def tilt(field, x, y, thetax=0, thetay=0, wavelength=632.8e-9):
     if np.abs(kx) > kmaxx or np.abs(ky) > kmaxy:
         raise ValueError("Tilt muito grande: vai dar aliasing! use no máximo thetax = {} e thetay = {}".format(kmaxx/k, kmaxy/k))
     return np.copy(field) * tilt
+
+def mirror(field, x, y, theta=0, phi=0, rs=-1, rp=-1, wavelength=632.8e-9):
+    """
+    theta : ângulo do espelho com z (0 = perpendicular ao feixe)
+    phi   : orientação azimutal do espelho
+    rs, rp: coeficientes de Fresnel (default -1 para espelho metálico ideal)
+    """
+    # Inverte propagação
+    field = np.conj(field)
+
+    # O tilt do espelho equivale a dois tilts (fator 2 = ida e volta)
+    thetax = 2 * np.sin(theta) * np.cos(phi)
+    thetay = 2 * np.sin(theta) * np.sin(phi)
+    field = tilt(field, x, y, thetax=thetax, thetay=thetay, wavelength=wavelength)
+
+    # Rotação de polarização s/p → x/y (só para campos vetoriais)
+    if field.ndim == 3:
+        c, s = np.cos(phi), np.sin(phi)
+        R = np.array([[ c,  s],
+                      [-s,  c]])
+        Jones = np.array([[rp, 0],
+                          [0,  rs]])
+        M = R.T @ Jones @ R
+        field = field @ M.T
+
+    return field
