@@ -70,7 +70,7 @@ def mirror(field, x, y, theta=0, phi=0, rs=-1, rp=-1,tilt=False,safe = False, wa
         field = field * rs
     return field
 
-def BeamSplitter(field1=None,field2=None,theta=np.pi/4, phi_0=0, phi_r=0, phi_t=0, wavelength=632.8e-9):
+def beam_splitter(field1=None,field2=None,theta=np.pi/4, phi_0=0, phi_r=0, phi_t=0, wavelength=632.8e-9):
     if field1 is not None and field2 is not None:
         field1 = np.copy(field1)
         field2 = np.copy(field2)
@@ -91,7 +91,7 @@ def BeamSplitter(field1=None,field2=None,theta=np.pi/4, phi_0=0, phi_r=0, phi_t=
 
     return field
 
-def Lens(field, x, y, f, n=1.5, d0 = 0, wavelength=632.8e-9):
+def lens(field, x, y, f, n=1.5, d0 = 0, wavelength=632.8e-9):
     field = np.copy(field)
     k = 2 * np.pi / wavelength
     lens_phase = np.exp(-1j * k * (x**2 + y**2) / (2*f)) * np.exp(-1j * n * k * d0)
