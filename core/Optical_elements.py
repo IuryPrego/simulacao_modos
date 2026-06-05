@@ -25,7 +25,7 @@ def angular_spectrum(field, x, y, z, wavelength=632.8e-9):
     
     return field
 
-def tilt(field, x, y, thetax=0, thetay=0, safe= True, wavelength=632.8e-9):
+def tilt(field, x, y, thetax=0, thetay=0, safe=True, wavelength=632.8e-9):
     k = 2 * np.pi / wavelength
     tilt_phase = np.exp(1j * k * thetay * y) * np.exp(1j * k * thetax * x)
     if safe:
@@ -42,20 +42,17 @@ def tilt(field, x, y, thetax=0, thetay=0, safe= True, wavelength=632.8e-9):
             raise ValueError("Tilt muito grande: vai dar aliasing! use no máximo thetax = {} e thetay = {}".format(kmaxx/k, kmaxy/k))
     return np.copy(field) * tilt_phase[...,None] if field.ndim == 3 else np.copy(field) * tilt_phase
 
-def mirror(field, x, y, theta=0, phi=0, rs=-1, rp=-1,tilt=False,safe = False, wavelength=632.8e-9):
+def mirror(field, theta=0, phi=0, rs=-1, rp=-1,do_tilt=False,safe = False, x=None, y=None, wavelength=632.8e-9):
     """
     theta : ângulo do espelho com z (0 = perpendicular ao feixe)
     phi   : orientação azimutal do espelho
     rs, rp: coeficientes de Fresnel (default -1 para espelho metálico ideal)
     """
-    # Inverte propagação
-    field = np.conj(field)
-
     # O tilt do espelho equivale a dois tilts (fator 2 = ida e volta)
-    thetax = 2 * np.sin(theta) * np.cos(phi)
-    thetay = 2 * np.sin(theta) * np.sin(phi)
-    if tilt:
-        field = tilt(field, x, y, thetax=thetax, thetay=thetay, safe=safe, wavelength=wavelength)
+    if do_tilt:
+        thetax = 2 * np.sin(theta) * np.cos(phi)
+        thetay = 2 * np.sin(theta) * np.sin(phi)
+        field = tilt(field,thetax=thetax, thetay=thetay, safe=safe, x=x, y=y, wavelength=wavelength)
 
     # Rotação de polarização s/p → x/y (só para campos vetoriais)
     if field.ndim == 3:
@@ -70,7 +67,8 @@ def mirror(field, x, y, theta=0, phi=0, rs=-1, rp=-1,tilt=False,safe = False, wa
         field = field * rs
     return field
 
-def beam_splitter(field1=None,field2=None,theta=np.pi/4, phi_0=0, phi_r=0, phi_t=0, wavelength=632.8e-9):
+def beam_splitter(field1=None,field2=None,theta=np.pi/4, phi_0=np.pi/2, phi_r=-np.pi/2, phi_t=0):
+
     if field1 is not None and field2 is not None:
         field1 = np.copy(field1)
         field2 = np.copy(field2)
@@ -83,13 +81,7 @@ def beam_splitter(field1=None,field2=None,theta=np.pi/4, phi_0=0, phi_r=0, phi_t
     else:
         raise ValueError("Pelo menos um dos campos deve ser fornecido")
     
-    tau = np.exp(1j * phi_0)*np.array([[np.sin(theta)*np.exp(1j * phi_r), np.cos(theta)*np.exp(-1j * phi_t)],
-                                       [np.cos(theta)*np.exp(1j * phi_t), -np.sin(theta)*np.exp(-1j * phi_r)]])
-    
-    field =np.exp(1j * phi_0)*np.array([np.sin(theta)*np.exp(1j*phi_r) * field1 + np.cos(theta)*np.exp(-1j*phi_t) * field2,
-                                        np.cos(theta)*np.exp(1j*phi_t) * field1 - np.sin(theta)*np.exp(-1j*phi_r) * field2])
-
-    return field
+    return np.exp(1j * phi_0) * (np.sin(theta)*np.exp(1j*phi_r) * field1 + np.cos(theta)*np.exp(-1j*phi_t) * field2), np.exp(1j * phi_0)*(np.cos(theta)*np.exp(1j*phi_t) * field1 - np.sin(theta)*np.exp(-1j*phi_r) * field2)
 
 def lens(field, x, y, f, n=1.5, d0 = 0, wavelength=632.8e-9):
     field = np.copy(field)
