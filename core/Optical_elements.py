@@ -67,19 +67,12 @@ def mirror(field, theta=0, phi=0, rs=-1, rp=-1,do_tilt=False,safe = False, x=Non
         field = field * rs
     return field
 
-def beam_splitter(field1=None,field2=None,theta=np.pi/4, phi_0=np.pi/2, phi_r=-np.pi/2, phi_t=0):
+def beam_splitter(field1,field2=None,theta=np.pi/4, phi_0=np.pi/2, phi_r=-np.pi/2, phi_t=0):
 
-    if field1 is not None and field2 is not None:
-        field1 = np.copy(field1)
+    if field2 is not None:
         field2 = np.copy(field2)
-    elif field1 is not None:
-        field1 = np.copy(field1)
-        field2 = np.zeros_like(field1)
-    elif field2 is not None:
-        field2 = np.copy(field2)
-        field1 = np.zeros_like(field2)
     else:
-        raise ValueError("Pelo menos um dos campos deve ser fornecido")
+        field2 = np.zeros_like(field1)
     
     return np.exp(1j * phi_0) * (np.sin(theta)*np.exp(1j*phi_r) * field1 + np.cos(theta)*np.exp(-1j*phi_t) * field2), np.exp(1j * phi_0)*(np.cos(theta)*np.exp(1j*phi_t) * field1 - np.sin(theta)*np.exp(-1j*phi_r) * field2)
 
