@@ -70,6 +70,5 @@ def hermite_gauss_1d(x, m, w=1e-3):
     xi = a * x 
     
     log_norm = 0.5*np.log(a) - 0.5 * (m*np.log(2) + gammaln(m+1) + 0.5*np.log(np.pi))
-    norm = np.exp(log_norm)
     
-    return norm * eval_hermite(m, xi) * np.exp(-xi**2 / 2)
+    return np.exp(log_norm) * eval_hermite(m, xi) * np.exp(-xi**2 / 2)
