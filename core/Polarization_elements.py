@@ -49,10 +49,10 @@ def filter_polarizer(field,theta=0,method='linear'):
             cos, sen = np.cos(theta), np.sin(theta)
             phase_mat = np.array([[cos**2,cos*sen],
                                   [cos*sen, sen**2]])
-        case 'Rcirc':
+        case 'Lcirc':
             phase_mat = 1/2*np.array([[1,  -1j],
                                       [1j, 1]])
-        case 'Lcirc':
+        case 'Rcirc':
             phase_mat = 1/2*np.array([[1,  1j],
                                       [-1j, 1]])
         case _:  
