@@ -40,7 +40,7 @@ def intensity(field,cmap='viridis',vector_field=True,pace=None,scale=None,t=None
             pace = max(int(np.min(field.shape)/20),2)
         if scale is None:
             scale = max(pace/2,.8)
-        alp = 1
+            
         for i in range(0, Ny, pace):
             for j in range(0, Nx, pace):
 

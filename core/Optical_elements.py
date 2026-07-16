@@ -5,7 +5,7 @@ import numpy as np
 def angular_spectrum(field, x, y, z, wavelength=632.8e-9):
     field = np.copy(field)
 
-    nx, ny = field.shape[0], field.shape[1]
+    ny, nx = field.shape[0], field.shape[1]
     dx = float(x[0, 1] - x[0, 0])
     dy = float(y[1, 0] - y[0, 0])
     k = 2*np.pi / wavelength
@@ -14,7 +14,7 @@ def angular_spectrum(field, x, y, z, wavelength=632.8e-9):
     kx, ky = np.meshgrid(kx, ky)
 
     field_fourier = np.fft.fft2(field, axes=(0, 1))
-    propagator = np.exp(-1j * (kx**2 + ky**2) * z / (2*k))
+    propagator = np.exp(-1j * (kx**2 + ky**2) * z / (2*k))* np.exp(1j * k * z)
 
     if field_fourier.ndim == 3:
         field_fourier *= propagator[..., None]

@@ -76,12 +76,12 @@ def q_plate(x,y,field,theta=0,delta=np.pi,q=1/2):
     cos, sen = np.cos(-alpha), np.sin(-alpha)
     rot = np.array([[cos,-sen],
                     [sen, cos]])
-    rot_minus = rot.transpose(3,2,0,1)[...]
+    rot_minus = rot.transpose(2,3,0,1)[...]
 
     cos, sen = np.cos(alpha), np.sin(alpha)
     rot = np.array([[cos,-sen],
                     [sen, cos]])
-    rot_plus = rot.transpose(3,2,0,1)[...]
+    rot_plus = rot.transpose(2,3,0,1)[...]
     
     
     phase_mat = rot_minus@phase_mat@rot_plus
