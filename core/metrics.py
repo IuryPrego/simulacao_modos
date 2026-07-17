@@ -94,7 +94,7 @@ def intensity(field,cmap='viridis',vector_field=True,pace=None,scale=None,t=None
                     xy=(xx+dxx, yy+dyy),
                     xytext=(xx, yy),
                     arrowprops=dict(arrowstyle='->',
-                                    color='black',
+                                    color='red',
                                     linewidth=1)
                 )
 
