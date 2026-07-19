@@ -83,7 +83,6 @@ def intensity(field,cmap='viridis',vector_field=True,pace=None,scale=None,t=np.p
         se = np.sin(eps)
         se[np.abs(se)<=1e-14] = 0
         sgn = np.where(se < 0,-1,1)
-        print(sgn)
         t_local = t + np.where(sgn > 0,0,np.pi)
         dt = .01
         ca,sa = np.cos(alpha),np.sin(alpha)
