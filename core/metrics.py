@@ -1,12 +1,12 @@
 from matplotlib import pyplot as plt
-from matplotlib.patches import Ellipse
+from matplotlib.collections import EllipseCollection
 import numpy as np
 
 def inner_product(f, g, dx, dy):
     return np.sum(f * np.conj(g)) * dx * dy
 
 # Plot the intensity and the polarization directions and return the fig,ax to posterior alterations
-def intensity(field,cmap='viridis',vector_field=True,pace=None,scale=None,t=None,rel_threshold=1e-1):
+def intensity(field,cmap='viridis',vector_field=True,pace=None,scale=None,t=np.pi/2,rel_threshold=1e-1):
     field_p = np.copy(field)
     field = np.copy(field)
 
@@ -28,76 +28,82 @@ def intensity(field,cmap='viridis',vector_field=True,pace=None,scale=None,t=None
         if field.max() > 0:
             field_p[field/field.max() <= rel_threshold] = 0
 
-        Ex = field_p[...,0]
-        Ey = field_p[...,1]
+        if pace is None:
+            pace = max(int(np.min(field.shape)/15),2)
+        if scale is None:
+            scale = max(pace/2,1)*.8
 
-        norm = np.sqrt(np.abs(Ex)**2 + np.abs(Ey)**2)
+        ii = np.arange(0,Ny,pace)
+        jj = np.arange(0,Nx,pace)
+        ii,jj = np.meshgrid(ii,jj, indexing='ij')
+
+        ii = ii.ravel()
+        jj = jj.ravel()
+        
+        Ex = field_p[ii,jj,0]
+        Ey = field_p[ii,jj,1]
+
+        norm = np.abs(Ex)**2 + np.abs(Ey)**2 #squared norm in this point
+
+        mask = norm > 0
+        ii,jj,Ex,Ey,norm = ii[mask],jj[mask],Ex[mask],Ey[mask],norm[mask]
+        
+        norm = np.sqrt(norm)
         norm[norm == 0] = 1
         Exn = Ex / norm
         Eyn = Ey / norm
+        exr = np.abs(Exn)
+        eyr = np.abs(Eyn)
+        eps = 2*np.pi+np.angle(Eyn) - np.angle(Exn)
 
-        if pace is None:
-            pace = max(int(np.min(field.shape)/20),2)
-        if scale is None:
-            scale = max(pace/2,.8)
-            
-        for i in range(0, Ny, pace):
-            for j in range(0, Nx, pace):
+        S=exr**2+eyr**2
+        P=exr*eyr*np.abs(np.sin(eps))
+        sqrt_plus = np.sqrt(np.clip(S + 2*P,0,None))
+        sqrt_minus = np.sqrt(np.clip(S - 2*P,0,None))
 
-                if np.linalg.norm(field_p[i, j]) == 0:
-                    continue
+        den = exr**2 - eyr**2
+        den[np.abs(den) <= 1e-14] = 0
+        num = 2*exr*eyr*np.cos(eps)
+        num[np.abs(num) <= 1e-14] = 0
+        w = (sqrt_plus + sqrt_minus)/2
+        h = (sqrt_plus - sqrt_minus)/2
+        alpha = -np.arctan2(num, den)/2
+        # imshow inverts y-axis
+        # so alpha = -alpha for correct display
+        ec = EllipseCollection(
+            widths=w*scale*2, heights=h*scale*2, angles=alpha*180/np.pi, units='xy',
+            offsets=np.column_stack([jj, ii]), offset_transform=ax.transData,
+            edgecolor='black', facecolor='none'
+            )
+        
+        ax.add_collection(ec)
 
-                ex = Exn[i, j]
-                exr = np.abs(ex)
-                ey = Eyn[i, j]
-                eyr = np.abs(ey)
-                eps = np.angle(ey) - np.angle(ex)
+        a = w*scale
+        b = h*scale
+        se = np.sin(eps)
+        se[np.abs(se)<=1e-14] = 0
+        sgn = np.where(se < 0,-1,1)
+        print(sgn)
+        t_local = t + np.where(sgn > 0,0,np.pi)
+        dt = .01
+        ca,sa = np.cos(alpha),np.sin(alpha)
+        ct, st = np.cos(t_local-10*dt),np.sin(t_local-10*dt)
+        
+        xx = jj + a*ct*ca - b*st*sa
+        yy = ii + a*ct*sa + b*st*ca
 
-                S=exr**2+eyr**2
-                P=exr*eyr*np.abs(np.sin(eps))
-                sqrt_plus = np.sqrt(S + 2*P)
-                sqrt_minus = np.sqrt(S - 2*P)
-                den = exr**2 - eyr**2
-                den = 0 if np.abs(den) <= 1e-14 else den
-                num = 2*exr*eyr*np.cos(eps)
-                num = 0 if np.abs(num) <= 1e-14 else num
+        dxx = (-a*st*ca - b*ct*sa) * dt*sgn
+        dyy = (-a*st*sa + b*ct*ca) * dt*sgn
+        
+        dnorm = np.sqrt(dxx**2 + dyy**2)
+        dnorm[dnorm == 0] = 1
+        
+        dxx = dxx / dnorm * .2*scale
+        dyy = dyy / dnorm * .2*scale
 
-                w = (sqrt_plus + sqrt_minus)/2
-                h = (sqrt_plus - sqrt_minus)/2
-                alpha = -np.arctan2(num, den)/2
-                # imshow inverts y-axis
-                # so alpha = -alpha for correct display
-
-                e = Ellipse(xy=(j, i),
-                            width=w*scale,
-                            height=h*scale,
-                            angle=alpha*180/np.pi,
-                            edgecolor='black',
-                            facecolor='none')
-                ax.add_patch(e)
-
-                a = w/2*scale
-                b = h/2*scale
-                sng = -1 if np.sin(eps) < 0 else 1
-                t_local = t if t is not None else 0 #(0 if sng > 0 else np.pi)
-                dt = .01/scale*sng
-
-                xx = j + a*np.cos(t_local-10*dt)*np.cos(alpha) - b*np.sin(t_local-10*dt)*np.sin(alpha)
-                yy = i + a*np.cos(t_local-10*dt)*np.sin(alpha) + b*np.sin(t_local-10*dt)*np.cos(alpha)
-                ax.plot(xx, yy, alpha=.8, linewidth=.8)
-
-                dxx = (-a*np.sin(t_local-10*dt)*np.cos(alpha) - b*np.cos(t_local-10*dt)*np.sin(alpha))*dt
-                dyy = (-a*np.sin(t_local-10*dt)*np.sin(alpha) + b*np.cos(t_local-10*dt)*np.cos(alpha))*dt
-               
-                ax.annotate(
-                    '',
-                    xy=(xx+dxx, yy+dyy),
-                    xytext=(xx, yy),
-                    arrowprops=dict(arrowstyle='->',
-                                    color='red',
-                                    linewidth=1)
-                )
-
+        ax.quiver(xx-dxx, yy-dyy, dxx, dyy, angles='xy', scale_units='xy', scale=.2,
+                   units='xy', width=0.08*scale,
+                   color='black', headwidth=20, headlength=25, headaxislength=20)
     return fig, ax
 
 # only work in scalar fields
