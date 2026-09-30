@@ -3,10 +3,12 @@ from math import factorial
 import numpy as np
 from scipy.special import genlaguerre, hermite, eval_hermite, gammaln
 
+from core.Polarization_elements import scalar_to_vector
+
 # creation of intensity modes laguerre and hermite gauss beams
 # the functions get x,y and beams parameters to create and return a escalar field
 
-def laguerre_gauss(x,y,l=0,p=0,z=0,w0=1e-3,wavelength=632.8e-9):
+def laguerre_gauss(x, y, l=0, p=0, z=0, w0=1e-3, polarization=(1,0), wavelength=632.8e-9):
     r = np.sqrt(x**2 + y**2)
     phi = np.arctan2(y, x)
     k = 2 * np.pi / wavelength
@@ -27,9 +29,9 @@ def laguerre_gauss(x,y,l=0,p=0,z=0,w0=1e-3,wavelength=632.8e-9):
 
     E = amplitude * np.exp(1j * phase)
 
-    return E*np.exp(log_norm)
+    return scalar_to_vector(E,polarization)*np.exp(log_norm)
 
-def hermite_gauss(x, y, m=0, n=0, z=0, w0=1e-3, wavelength=632.8e-9):
+def hermite_gauss(x, y, m=0, n=0, z=0, w0=1e-3, polarization=(1,0), wavelength=632.8e-9):
 
     k = 2 * np.pi / wavelength
     zR = np.pi * w0**2 / wavelength
@@ -63,7 +65,9 @@ def hermite_gauss(x, y, m=0, n=0, z=0, w0=1e-3, wavelength=632.8e-9):
     else:
         phase = 0
 
-    return amplitude * np.exp(1j * phase)
+    E = amplitude * np.exp(1j * phase)
+
+    return scalar_to_vector(E,polarization)
 
 def hermite_gauss_1d(x, m, w=1e-3):
     a = np.sqrt(2) / w
