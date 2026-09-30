@@ -1,6 +1,22 @@
 import numpy as np
 from scipy.ndimage import gaussian_filter
 
+def pinhole_mask(x, y, radius):
+    r = np.sqrt(y**2 + x**2)
+    mask = np.ones([*r.shape,2])
+
+    mask[r >= radius] = 0
+
+    return mask
+
+def triangular_mask(x, y, side_lenght):
+    mask = np.ones([*x.shape,2])
+    mask[y > np.sqrt(3)*x + 2/3*side_lenght] = 0
+    mask[y > -np.sqrt(3)*x + 2/3*side_lenght] = 0
+    mask[y < -side_lenght/3] = 0
+
+    return mask
+
 # creation of masks that simulate turbulance
 # the functions get the shape and parameters to do a mask to be aplied in a scalar field (some alterations should be made to use it in a vector field)
 
