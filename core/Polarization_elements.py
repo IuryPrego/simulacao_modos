@@ -84,7 +84,8 @@ def q_plate(x,y,field,theta=0,delta=np.pi,q=1/2):
     rot_plus = rot.transpose(2,3,0,1)[...]
     
     
-    phase_mat = rot_minus@phase_mat@rot_plus
+    # waveplate with fast axis at alpha: R(alpha) D R(-alpha)
+    phase_mat = rot_plus@phase_mat@rot_minus
     field = phase_mat @ field[..., None]
 
     return field[...,0]
