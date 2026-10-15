@@ -13,14 +13,15 @@ def intensity(field,
               pace=None,
               scale=None,
               t=np.pi/2,
-              rel_threshold=1e-1):
+              rel_threshold=1e-1,
+              create_canvas=True):
     field = np.copy(field)
     if x is None:
         x = np.arange(field.shape[1])
     if y is None:
         y = np.arange(field.shape[0])
 
-    if field.ndim == 2:
+    if field.ndim == 2 and create_canvas:
         intensity = np.abs(field)**2
         fig,ax = plt.subplots()
         
@@ -30,7 +31,11 @@ def intensity(field,
         ax.axis('off')
         ax.imshow(intensity,cmap, vmin=0, vmax=max(1e-5,np.max(intensity)),extent=[x.min(), x.max(), y.min(), y.max()])
 
-    elif field.ndim == 3 and vector_field:
+    elif field.ndim == 2 and not create_canvas:
+        intensity = np.abs(field)**2
+        fig,ax = None, None
+    
+    elif field.ndim == 3 and vector_field and create_canvas:
         Ny,Nx = field.shape[:2]
         intensity = np.linalg.norm(field,axis=2)**2
         if intensity.max() != 0:
@@ -124,7 +129,7 @@ def intensity(field,
                 units='xy', width=0.08*scale,
                 color='black', headwidth=20, headlength=25, headaxislength=20)
     
-    elif field.ndim == 3 and not vector_field:
+    elif field.ndim == 3 and not vector_field and create_canvas:
         intensity = np.linalg.norm(field,axis=2)**2
         fig,ax = plt.subplots()
         
@@ -134,7 +139,10 @@ def intensity(field,
         ax.axis('off')
         ax.imshow(intensity,cmap, vmin=0, vmax=max(1e-5,np.max(intensity)),extent=[x.min(), x.max(), y.min(), y.max()])
 
-    return fig, ax
+    elif field.ndim == 3 and not create_canvas:
+        intensity = np.linalg.norm(field,axis=2)**2
+        fig,ax = None, None
+    return intensity,fig, ax
 
 # only work in scalar fields
 def phase(field):
