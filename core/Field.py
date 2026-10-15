@@ -32,7 +32,7 @@ class OpticalField:
         ax.axis('equal')
         ax.axis('off')
         intensity_tot = np.sum(intensity, axis=0)
-        ax.imshow(intensity_tot,cmap, vmin=0, vmax=max(1e-5,np.max(intensity_tot)),extent=[self.x.min(), self.x.max(), self.y.min(), self.y.max()])
+        ax.imshow(intensity_tot,cmap, vmin=0, vmax=max(1e-5,np.max(intensity_tot)),extent=[self.x.min(), self.x.max(), self.y.min(), self.y.max()],origin='lower')
         return intensity, fig, ax
 
     def Power(self):

@@ -29,7 +29,7 @@ def intensity(field,
 
         ax.axis('equal')
         ax.axis('off')
-        ax.imshow(intensity,cmap, vmin=0, vmax=max(1e-5,np.max(intensity)),extent=[x.min(), x.max(), y.min(), y.max()])
+        ax.imshow(intensity,cmap, vmin=0, vmax=max(1e-5,np.max(intensity)),extent=[x.min(), x.max(), y.min(), y.max()],origin='lower')
 
     elif field.ndim == 2 and not create_canvas:
         intensity = np.abs(field)**2
@@ -83,9 +83,9 @@ def intensity(field,
         cross_term[np.abs(cross_term) <= 1e-14] = 0
         w = (sqrt_plus + sqrt_minus)/2
         h = (sqrt_plus - sqrt_minus)/2
-        alpha = -np.arctan2(cross_term, axis_diff)/2
-        # imshow inverts y-axis
-        # so alpha = -alpha for correct display
+        # orientation of the major axis, measured counterclockwise from x
+        # (image is drawn with origin='lower', so y points up as in the meshgrid)
+        alpha = np.arctan2(cross_term, axis_diff)/2
 
         fig,ax = plt.subplots()
         
@@ -93,7 +93,7 @@ def intensity(field,
 
         ax.axis('equal')
         ax.axis('off')
-        ax.imshow(intensity,cmap, vmin=0, vmax=max(1e-5,np.max(intensity)),extent=[x.min(), x.max(), y.min(), y.max()])
+        ax.imshow(intensity,cmap, vmin=0, vmax=max(1e-5,np.max(intensity)),extent=[x.min(), x.max(), y.min(), y.max()],origin='lower')
 
         ec = EllipseCollection(
             widths=w*scale*2, heights=h*scale*2, angles=alpha*180/np.pi, units='xy',
@@ -137,7 +137,7 @@ def intensity(field,
 
         ax.axis('equal')
         ax.axis('off')
-        ax.imshow(intensity,cmap, vmin=0, vmax=max(1e-5,np.max(intensity)),extent=[x.min(), x.max(), y.min(), y.max()])
+        ax.imshow(intensity,cmap, vmin=0, vmax=max(1e-5,np.max(intensity)),extent=[x.min(), x.max(), y.min(), y.max()],origin='lower')
 
     elif field.ndim == 3 and not create_canvas:
         intensity = np.linalg.norm(field,axis=2)**2
