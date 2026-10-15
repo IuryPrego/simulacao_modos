@@ -1,17 +1,13 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-# propagation using angular espectrum and the paraxial aproximation
-def angular_spectrum(field, x, y, z, wavelength=632.8e-9):
-    field = np.copy(field)
+from core.grid import check_field
 
-    ny, nx = field.shape[0], field.shape[1]
-    dx = float(x[0, 1] - x[0, 0])
-    dy = float(y[1, 0] - y[0, 0])
-    k = 2*np.pi / wavelength
-    kx = 2*np.pi * np.fft.fftfreq(nx, d=dx)
-    ky = 2*np.pi * np.fft.fftfreq(ny, d=dy)
-    kx, ky = np.meshgrid(kx, ky)
+# propagation using angular espectrum and the paraxial aproximation
+def angular_spectrum(field, s, z):
+    check_field(field, s)
+    k = s.k
+    kx, ky = s.kxy
 
     field_fourier = np.fft.fft2(field, axes=(0, 1))
     propagator = np.exp(-1j * (kx**2 + ky**2) * z / (2*k))* np.exp(1j * k * z)
@@ -25,15 +21,13 @@ def angular_spectrum(field, x, y, z, wavelength=632.8e-9):
     
     return field
 
-def tilt(field, x, y, thetax=0, thetay=0, safe=True, wavelength=632.8e-9):
-    k = 2 * np.pi / wavelength
-    tilt_phase = np.exp(1j * k * thetay * y) * np.exp(1j * k * thetax * x)
+def tilt(field, s, thetax=0, thetay=0, safe=True):
+    check_field(field, s)
+    k = s.k
+    tilt_phase = np.exp(1j * k * thetay * s.y) * np.exp(1j * k * thetax * s.x)
     if safe:
-        dx = float(x[0, 1] - x[0, 0])
-        dy = float(y[1, 0] - y[0, 0])
-
-        kmaxx = np.pi / dx
-        kmaxy = np.pi / dy
+        kmaxx = np.pi / s.dx
+        kmaxy = np.pi / s.dy
 
         kx = k * thetax
         ky = k * thetay
@@ -42,17 +36,20 @@ def tilt(field, x, y, thetax=0, thetay=0, safe=True, wavelength=632.8e-9):
             raise ValueError("Tilt muito grande: vai dar aliasing! use no máximo thetax = {} e thetay = {}".format(kmaxx/k, kmaxy/k))
     return np.copy(field) * tilt_phase[...,None] if field.ndim == 3 else np.copy(field) * tilt_phase
 
-def mirror(field, theta=0, phi=0, rs=-1, rp=-1,do_tilt=False,safe = False, x=None, y=None, wavelength=632.8e-9):
+def mirror(field, theta=0, phi=0, rs=-1, rp=-1,do_tilt=False,safe = False, s=None):
     """
     theta : ângulo do espelho com z (0 = perpendicular ao feixe)
     phi   : orientação azimutal do espelho
     rs, rp: coeficientes de Fresnel (default -1 para espelho metálico ideal)
+    s     : setup, só é necessário com do_tilt=True
     """
     # O tilt do espelho equivale a dois tilts (fator 2 = ida e volta)
     if do_tilt:
+        if s is None:
+            raise ValueError("do_tilt=True needs the setup: mirror(..., s=s)")
         thetax = 2 * np.sin(theta) * np.cos(phi)
         thetay = 2 * np.sin(theta) * np.sin(phi)
-        field = tilt(field,thetax=thetax, thetay=thetay, safe=safe, x=x, y=y, wavelength=wavelength)
+        field = tilt(field, s, thetax=thetax, thetay=thetay, safe=safe)
 
     # Rotação de polarização s/p → x/y (só para campos vetoriais)
     if field.ndim == 3:
@@ -76,8 +73,9 @@ def beam_splitter(field1,field2=None,theta=np.pi/4, phi_0=np.pi/2, phi_r=-np.pi/
     
     return np.exp(1j * phi_0) * (np.sin(theta)*np.exp(1j*phi_r) * field1 + np.cos(theta)*np.exp(-1j*phi_t) * field2), np.exp(1j * phi_0)*(np.cos(theta)*np.exp(1j*phi_t) * field1 - np.sin(theta)*np.exp(-1j*phi_r) * field2)
 
-def lens(field, x, y, f, n=1.5, d0 = 0, wavelength=632.8e-9):
+def lens(field, s, f, n=1.5, d0 = 0):
+    check_field(field, s)
     field = np.copy(field)
-    k = 2 * np.pi / wavelength
-    lens_phase = np.exp(-1j * k * (x**2 + y**2) / (2*f)) * np.exp(-1j * n * k * d0)
+    k = s.k
+    lens_phase = np.exp(-1j * k * (s.x**2 + s.y**2) / (2*f)) * np.exp(-1j * n * k * d0)
     return field * lens_phase[...,None] if field.ndim == 3 else field * lens_phase

@@ -2,24 +2,31 @@ from matplotlib import pyplot as plt
 from matplotlib.collections import EllipseCollection
 import numpy as np
 
-def inner_product(f, g, dx, dy):
-    return np.sum(f * np.conj(g)) * dx * dy
+from core.grid import check_field
+
+def inner_product(f, g, s):
+    check_field(f, s)
+    check_field(g, s)
+    return np.sum(f * np.conj(g)) * s.dx * s.dy
 
 # Plot the intensity and the polarization directions and return the fig,ax to posterior alterations
+# without the setup s the axes are in pixels
 def intensity(field,
               cmap='viridis',
               vector_field=True,
-              x=None,y=None,
+              s=None,
               pace=None,
               scale=None,
               t=np.pi/2,
               rel_threshold=1e-1,
               create_canvas=True):
     field = np.copy(field)
-    if x is None:
+    if s is None:
         x = np.arange(field.shape[1])
-    if y is None:
         y = np.arange(field.shape[0])
+    else:
+        check_field(field, s)
+        x, y = s.x, s.y
 
     if field.ndim == 2 and create_canvas:
         intensity = np.abs(field)**2
@@ -150,13 +157,12 @@ def phase(field):
 
 
 # measure of power
-def power(x,y,field):
+def power(field, s):
+    check_field(field, s)
     field = np.copy(field)
-    
-    dx = float(x[0, 1] - x[0, 0])
-    dy = float(y[1, 0] - y[0, 0])
+
     if field.ndim == 3:
         field = np.linalg.norm(field,axis=2)
 
-    power = np.sum(np.abs(field)**2) * dx * dy
+    power = np.sum(np.abs(field)**2) * s.dx * s.dy
     return power

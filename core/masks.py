@@ -1,15 +1,20 @@
 import numpy as np
 from scipy.ndimage import gaussian_filter
 
-def pinhole_mask(field,x, y, radius):
-    r = np.sqrt(y**2 + x**2)
+from core.grid import check_field
+
+def pinhole_mask(field, s, radius):
+    check_field(field, s)
+    r = np.sqrt(s.y**2 + s.x**2)
     mask = np.ones([*r.shape,2])
 
     mask[r >= radius] = 0
 
     return np.copy(field) * mask
 
-def triangular_mask(field,x, y, side_lenght):
+def triangular_mask(field, s, side_lenght):
+    check_field(field, s)
+    x, y = s.x, s.y
     mask = np.ones([*x.shape,2])
     mask[y > np.sqrt(3)*x + 2/3*side_lenght] = 0
     mask[y > -np.sqrt(3)*x + 2/3*side_lenght] = 0
@@ -29,7 +34,7 @@ def turbulence_mask(shape, strength=1.0, corr_px=20):
     return np.exp(1j * phase)
 
 #chatgpt, nem entendo essa parte aqui, só queria poder testar
-def turbulence_screen(x, y,
+def turbulence_screen(s,
                       r0=8e-4,
                       L0=10.0,
                       l0=5e-4,
@@ -45,9 +50,9 @@ def turbulence_screen(x, y,
     if seed is not None:
         np.random.seed(seed)
 
-    dx = float(x[0,1] - x[0,0])
-    dy = float(y[1,0] - y[0,0])
-    ny, nx = x.shape
+    x, y = s.x, s.y
+    dx, dy = s.dx, s.dy
+    ny, nx = s.shape
 
     fx = np.fft.fftfreq(nx, dx)
     fy = np.fft.fftfreq(ny, dy)

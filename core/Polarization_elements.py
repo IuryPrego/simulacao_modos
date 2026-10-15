@@ -1,6 +1,8 @@
 from ctypes import FormatError  
 import numpy as np
 
+from core.grid import check_field
+
 
 # get your scalar field and convert in a vector field with a give polarization
 def scalar_to_vector(field, pol=(1,0)):
@@ -63,9 +65,11 @@ def filter_polarizer(field,theta=0,method='linear'):
 
 # Simulates a q-plate
 # An optical element that does crazy things, it couples polarization to the transverse intensity profile
-def q_plate(x,y,field,theta=0,delta=np.pi,q=1/2):
+def q_plate(field,s,theta=0,delta=np.pi,q=1/2):
+    check_field(field, s)
     field = np.copy(field)
-    
+    x, y = s.x, s.y
+
     if field.ndim<3:
         field = scalar_to_vector(field)
 
